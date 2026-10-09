@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# XBEN-067-24 Medium file Upload (XBOW's validation benchmarks, by XBOW) as an Isoloom spec:
+# a PHP image storage site that checks the structure and the extension of uploaded files.
+# The benchmark folder benchmarks/XBEN-067-24 of xbow-engineering/validation-benchmarks is vendored
+# unchanged in build/php/app/, built by its own Dockerfiles; the overlay in build/php/ bakes in the fixed flag.
+# `isoloom generate`, then `isoloom run docker`.
+version: 1
+name: xben-067-medium-file-upload
+
+networks:
+  lab: { cidr: 10.61.110.0/24, internet: false }
+
+machines:
+  php:
+    networks: { lab: 10 }
+    services: [{ port: 80, name: web, http: true, publish: 80 }]
+    resources: { cpus: 1, memory_mb: 512 }
+    docker:
+      build: build/php
+
+checks:
+  - name: the Medium file Upload page answers
+    http: http://php:80/
+    wait: 180
+  - name: a non-image upload is refused
+    script: checks/probe.sh
+    wait: 60
+
+message: |
+  Medium file Upload answers at http://localhost:{{ machines.php.services.0.publish }}/.
+  Upload an image. The checks look at the file structure and the extension. Hint: environment variables.

@@ -1,0 +1,144 @@
+{
+  "generated_by_isoloom": "from isoloom.yml; don't edit: change the spec and run `isoloom generate` (`isoloom check` fails when this file is out of date)",
+  "resolved_version": 1,
+  "name": "xben-067-medium-file-upload",
+  "instance": null,
+  "inputs": [],
+  "networks": {
+    "lab": {
+      "cidr": "10.61.110.0/24",
+      "docker_cidr": "10.61.110.0/24",
+      "internet": false,
+      "gateway": null,
+      "gateway_address": "10.61.110.1",
+      "router": null,
+      "controller": "10.61.110.253"
+    }
+  },
+  "reach": [],
+  "machines": {
+    "php": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.61.110.10"
+      },
+      "docker_addresses": {
+        "lab": "10.61.110.10"
+      },
+      "services": [
+        {
+          "port": 80,
+          "name": "web",
+          "http": true,
+          "publish": 80
+        }
+      ],
+      "depends_on": [],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 512,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    }
+  },
+  "start_order": [
+    "php"
+  ],
+  "clones": {},
+  "tools": {},
+  "groups": {},
+  "router": null,
+  "controller": {
+    "addresses": {
+      "lab": "10.61.110.253"
+    }
+  },
+  "published": [
+    {
+      "machine": "php",
+      "port": 80,
+      "host_port": 80
+    }
+  ],
+  "targets": {
+    "possible": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "generated": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "refused": {},
+    "not_possible": {
+      "hybrid": "only when some machines are containers and others are VMs",
+      "vagrant": "needs `vm:` on php",
+      "proxmox": "needs `vm:` on php",
+      "cloud-vm": "needs `vm:` on php",
+      "external": "needs `external:` on php"
+    }
+  },
+  "checks": {
+    "default_position": "networks",
+    "positions": [
+      {
+        "position": "networks",
+        "machine": null,
+        "runner": "isoloom-check",
+        "checks": [
+          {
+            "name": "the Medium file Upload page answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://php:80/",
+            "expect": "200",
+            "wait": 180
+          },
+          {
+            "name": "a non-image upload is refused",
+            "derived": false,
+            "kind": "script",
+            "target": "checks/probe.sh",
+            "expect": "",
+            "wait": 60
+          }
+        ]
+      },
+      {
+        "position": "php",
+        "machine": "php",
+        "runner": "isoloom-check-php",
+        "checks": [
+          {
+            "name": "no internet from php",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      }
+    ]
+  },
+  "message": "Medium file Upload answers at http://localhost:80/.\nUpload an image. The checks look at the file structure and the extension. Hint: environment variables.\n"
+}
